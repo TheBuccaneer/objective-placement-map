@@ -25,3 +25,7 @@ results/runs/**
 # Local source-provenance inventories
 results/source-inventory/**
 !results/source-inventory/.gitkeep
+
+# Locally materialized canonical input builds
+results/input-builds/**
+!results/input-builds/.gitkeep

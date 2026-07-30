@@ -231,6 +231,19 @@ def main() -> int:
         action="store_true",
         help="Keep copied source package and inputs inside the run directory",
     )
+    parser.add_argument(
+        "--inputs-from-source-snapshot",
+        action="store_true",
+        help=(
+            "Rebuild all canonical inputs from the pinned measurement-source "
+            "snapshot before running the analysis"
+        ),
+    )
+    parser.add_argument(
+        "--source-snapshot",
+        type=Path,
+        help="Explicit pinned source snapshot used with --inputs-from-source-snapshot",
+    )
     args = parser.parse_args()
 
     repo = Path(__file__).resolve().parents[1]
@@ -265,11 +278,77 @@ def main() -> int:
     workspace = temp_dir / "workspace"
     log_dir = temp_dir / "logs"
     log_dir.mkdir(parents=True)
+    input_materialization: dict[str, Any] = {"enabled": False}
 
     try:
         shutil.copytree(package, workspace)
         make_writable(workspace)
         shutil.copy2(active_script, workspace / "analysis.py")
+
+        if args.inputs_from_source_snapshot:
+            configured_commit = str(project["source"]["commit"])
+            source_snapshot = (
+                args.source_snapshot.expanduser().resolve()
+                if args.source_snapshot
+                else (
+                    repo
+                    / "data"
+                    / "source-snapshots"
+                    / f"energy-{configured_commit[:12]}"
+                ).resolve()
+            )
+            materialization_root = temp_dir / "input-materialization"
+            materializer_command = [
+                sys.executable,
+                str(repo / "scripts" / "materialize_analysis_inputs.py"),
+                "--source-snapshot",
+                str(source_snapshot),
+                "--output-root",
+                str(materialization_root),
+            ]
+            materializer = subprocess.run(
+                materializer_command,
+                cwd=repo,
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                check=False,
+            )
+            (log_dir / "input-materialization.stdout.log").write_text(
+                materializer.stdout, encoding="utf-8"
+            )
+            (log_dir / "input-materialization.stderr.log").write_text(
+                materializer.stderr, encoding="utf-8"
+            )
+            if materializer.returncode != 0:
+                raise RuntimeError(
+                    "input materialization failed; see "
+                    f"{log_dir / 'input-materialization.stderr.log'}"
+                )
+
+            rebuilt_inputs = materialization_root / "inputs"
+            if not rebuilt_inputs.is_dir():
+                raise RuntimeError(
+                    f"materialized inputs directory missing: {rebuilt_inputs}"
+                )
+            shutil.rmtree(workspace / "inputs")
+            shutil.copytree(rebuilt_inputs, workspace / "inputs")
+
+            input_manifest_path = materialization_root / "INPUT_MANIFEST.json"
+            input_manifest = json.loads(
+                input_manifest_path.read_text(encoding="utf-8")
+            )
+            input_materialization = {
+                "enabled": True,
+                "source_snapshot": str(source_snapshot.relative_to(repo)),
+                "materializer_command": materializer_command,
+                "manifest_path": "input-materialization/INPUT_MANIFEST.json",
+                "manifest_sha256": sha256(input_manifest_path),
+                "manifest": input_manifest,
+                "stdout_log": "logs/input-materialization.stdout.log",
+                "stderr_log": "logs/input-materialization.stderr.log",
+            }
+
         (workspace / "outputs").mkdir(exist_ok=True)
         (workspace / "figures").mkdir(exist_ok=True)
         for path in (workspace / "outputs").glob("*"):
@@ -381,6 +460,7 @@ def main() -> int:
                 "stdout_log": "logs/stdout.log",
                 "stderr_log": "logs/stderr.log",
             },
+            "analysis_inputs": input_materialization,
             "environment": {
                 "python": sys.version,
                 "python_executable": sys.executable,
@@ -427,6 +507,11 @@ def main() -> int:
             print(
                 "Figure byte identity (informational only): "
                 f"{comparison['figures']['byte_identical_count']}/{fig_count}"
+            )
+        if args.inputs_from_source_snapshot:
+            print(
+                "Analysis inputs: rebuilt from pinned source snapshot; "
+                "28/28 exact reference matches"
             )
         return 0
     except Exception:

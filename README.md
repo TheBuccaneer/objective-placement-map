@@ -73,3 +73,30 @@ The snapshot is stored under `data/source-snapshots/energy-<commit12>/`. It
 preserves the original source-relative paths and includes `SNAPSHOT.json`, the
 inventory map, and a SHA-256 manifest. This closes the provenance chain from the
 pinned `energy/new` commit to every canonical analysis input.
+
+## Full source-to-paper reproduction
+
+The complete provenance chain can be exercised without reading the canonical
+inputs from the historical analysis package:
+
+```bash
+source .venv/bin/activate
+make verify-source-snapshots
+make build-inputs
+make reproduce
+```
+
+`make build-inputs` reconstructs all 28 canonical input CSVs from the pinned
+measurement-source snapshot and verifies every file byte-for-byte against the
+frozen paper reference. `make reproduce` then uses a fresh materialization in
+an isolated analysis run and requires all 37 numerical output tables to match
+the frozen reference exactly.
+
+Each successful reproduction retains:
+
+- the source-snapshot identity and measurement commit,
+- a per-input source-path and SHA-256 map,
+- an input-materialization manifest,
+- 37 regenerated result tables,
+- five regenerated figures,
+- the complete analysis run manifest and logs.

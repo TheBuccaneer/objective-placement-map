@@ -1,0 +1,9 @@
+input_materialization:
+  schema_version: analysis-input-materialization-v1
+  expected_input_count: 28
+  source_snapshot_prefix: energy-
+  require_exact_reference_match: true
+  preserve_canonical_filenames: true
+  copied_inputs_read_only: true
+  normalize_mtime_to_epoch: true
+  manifest_algorithm: sha256
