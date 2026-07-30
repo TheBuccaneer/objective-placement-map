@@ -4,11 +4,11 @@ analysis:
   active_script: src/placement_analysis/analysis.py
   expected_csv_tables: 37
   expected_figures: 5
-  exact_reference_comparison: true
-  run_schema_version: analysis-run-v1
-
+  run_schema_version: analysis-run-v2
+  exact_csv_reference_comparison: true
+  figure_reference_policy: same_names_valid_png_same_format_mode_dimensions
 execution:
-  python_hash_seed: "0"
+  python_hash_seed: '0'
   matplotlib_backend: Agg
   timezone: UTC
   locale: C.UTF-8

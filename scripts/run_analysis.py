@@ -18,6 +18,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from PIL import Image
 import yaml
 
 
@@ -108,6 +109,94 @@ def compare_directory(reference: Path, actual: Path, suffix: str) -> dict[str, A
     }
 
 
+def png_contract(path: Path) -> dict[str, Any]:
+    try:
+        with Image.open(path) as image:
+            image.verify()
+        with Image.open(path) as image:
+            return {
+                "valid": True,
+                "format": image.format,
+                "mode": image.mode,
+                "size": [int(image.width), int(image.height)],
+            }
+    except Exception as exc:  # pragma: no cover - diagnostic path
+        return {
+            "valid": False,
+            "error": f"{type(exc).__name__}: {exc}",
+        }
+
+
+def compare_figure_contract(reference: Path, actual: Path) -> dict[str, Any]:
+    ref = {
+        p.relative_to(reference).as_posix(): p
+        for p in sorted(reference.rglob("*.png"))
+        if p.is_file()
+    }
+    got = {
+        p.relative_to(actual).as_posix(): p
+        for p in sorted(actual.rglob("*.png"))
+        if p.is_file()
+    }
+
+    missing = sorted(set(ref) - set(got))
+    unexpected = sorted(set(got) - set(ref))
+    common = sorted(set(ref) & set(got))
+
+    byte_changed: list[str] = []
+    invalid_reference: dict[str, Any] = {}
+    invalid_actual: dict[str, Any] = {}
+    structural_changes: dict[str, Any] = {}
+
+    for name in common:
+        if sha256(ref[name]) != sha256(got[name]):
+            byte_changed.append(name)
+
+        ref_contract = png_contract(ref[name])
+        got_contract = png_contract(got[name])
+
+        if not ref_contract.get("valid", False):
+            invalid_reference[name] = ref_contract
+            continue
+        if not got_contract.get("valid", False):
+            invalid_actual[name] = got_contract
+            continue
+
+        compared_keys = ("format", "mode", "size")
+        differences = {
+            key: {
+                "reference": ref_contract[key],
+                "actual": got_contract[key],
+            }
+            for key in compared_keys
+            if ref_contract[key] != got_contract[key]
+        }
+        if differences:
+            structural_changes[name] = differences
+
+    contract_match = not (
+        missing
+        or unexpected
+        or invalid_reference
+        or invalid_actual
+        or structural_changes
+    )
+
+    return {
+        "policy": "same_names_valid_png_same_format_mode_dimensions",
+        "reference_count": len(ref),
+        "actual_count": len(got),
+        "contract_match": contract_match,
+        "byte_identical_count": len(common) - len(byte_changed),
+        "byte_changed": byte_changed,
+        "missing": missing,
+        "unexpected": unexpected,
+        "invalid_reference": invalid_reference,
+        "invalid_actual": invalid_actual,
+        "structural_changes": structural_changes,
+    }
+
+
 def package_versions(names: list[str]) -> dict[str, str | None]:
     versions: dict[str, str | None] = {}
     for name in names:
@@ -132,7 +221,10 @@ def main() -> int:
     parser.add_argument(
         "--compare-reference",
         action="store_true",
-        help="Require byte-identical CSV and PNG outputs versus the frozen snapshot",
+        help=(
+            "Require byte-identical CSV outputs and structurally valid PNG "
+            "figures versus the frozen snapshot"
+        ),
     )
     parser.add_argument(
         "--keep-workspace",
@@ -227,14 +319,27 @@ def main() -> int:
         if fig_count != expected_fig:
             raise RuntimeError(f"expected {expected_fig} figures, generated {fig_count}")
 
-        comparison: dict[str, Any] = {"enabled": args.compare_reference}
+        comparison: dict[str, Any] = {
+            "enabled": args.compare_reference,
+            "csv_policy": "byte_exact",
+            "figure_policy": "same_names_valid_png_same_format_mode_dimensions",
+        }
         if args.compare_reference:
-            csv_cmp = compare_directory(package / "outputs", workspace / "outputs", ".csv")
-            png_cmp = compare_directory(package / "figures", workspace / "figures", ".png")
-            comparison.update({"csv": csv_cmp, "figures": png_cmp})
-            comparison["exact_match"] = csv_cmp["exact_match"] and png_cmp["exact_match"]
-            if not comparison["exact_match"]:
-                raise RuntimeError("generated results differ from frozen reference")
+            csv_cmp = compare_directory(
+                package / "outputs", workspace / "outputs", ".csv"
+            )
+            figure_cmp = compare_figure_contract(
+                package / "figures", workspace / "figures"
+            )
+            comparison.update({"csv": csv_cmp, "figures": figure_cmp})
+            comparison["passed"] = (
+                csv_cmp["exact_match"] and figure_cmp["contract_match"]
+            )
+            if not comparison["passed"]:
+                raise RuntimeError(
+                    "generated numeric results or figure contracts differ "
+                    "from the frozen reference"
+                )
 
         generated_dir = temp_dir / "generated"
         generated_dir.mkdir()
@@ -315,7 +420,14 @@ def main() -> int:
         print(f"Run directory: {final_dir}")
         print(f"Generated: {csv_count} CSV tables and {fig_count} figures")
         if args.compare_reference:
-            print("Reference comparison: byte-identical")
+            print(
+                "Reference comparison: CSV tables byte-identical; "
+                "figure contracts matched"
+            )
+            print(
+                "Figure byte identity (informational only): "
+                f"{comparison['figures']['byte_identical_count']}/{fig_count}"
+            )
         return 0
     except Exception:
         failed = runs_root / f"{run_id}-FAILED"

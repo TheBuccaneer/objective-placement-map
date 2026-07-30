@@ -14,7 +14,7 @@ Each successful run records:
 - Python and package versions,
 - deterministic environment variables,
 - hashes of all 37 CSV tables and five figures,
-- exact comparison status against the frozen reference.
+- byte-exact CSV and structural figure-validation status against the frozen reference.
 
 ## Rationale
 

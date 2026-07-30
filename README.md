@@ -39,6 +39,6 @@ Every run is isolated under `results/runs/<run-id>/` and contains:
 - 37 regenerated CSV tables,
 - five regenerated figures.
 
-The check target requires byte-identical outputs versus the frozen reference.
+The check target requires byte-identical CSV tables. Figures must have the same names, be valid PNG files, and match the reference format, color mode, and dimensions. PNG byte hashes are recorded but are informational because renderer metadata and font rasterization can vary across environments.
 Generated runs are intentionally excluded from Git; publish a selected run as a
 separate release artifact and cite its manifest.
