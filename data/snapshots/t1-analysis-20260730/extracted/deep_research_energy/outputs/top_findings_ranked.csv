@@ -1,0 +1,6 @@
+finding,statement,surprise,effect_size,robustness,breadth,domain_symmetry,novelty,explainability,paper_value,total
+Large-regime objective split,All 15 large AXPY/STREAM/REDUCTION cells choose RTX 3090 for runtime and RTX 5060 Ti for energy.,5,5,5,5,5,3,5,5,38
+Static GPU policy is costly,Always 3090 median energy regret 72.382%; always 5060 Ti median runtime regret 110.564%.,4,5,5,5,5,4,5,5,38
+Maximum threads is costly,Maximum CPU threads have median energy regret 38.517%.,5,5,4,5,5,3,5,5,37
+Tiny decision front,Strict Pareto fronts average 1.549 configurations per 18-point cell.,4,5,5,5,4,4,5,5,37
+EDP follows runtime,EDP and runtime point winners agree in 48/51 cells.,4,4,5,5,4,3,5,5,35

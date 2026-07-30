@@ -1,0 +1,11 @@
+threshold_pct,canonical_conflict,cells,with_joint_optimum,without_joint_optimum
+1,False,27,26,1
+1,True,24,0,24
+2,False,27,26,1
+2,True,24,0,24
+5,False,27,27,0
+5,True,24,0,24
+10,False,27,27,0
+10,True,24,2,22
+20,False,27,27,0
+20,True,24,5,19

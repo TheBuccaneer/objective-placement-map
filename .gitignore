@@ -1,0 +1,23 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Local and mutable data
+data/raw/**
+!data/raw/.gitkeep
+results/runs/**
+!results/runs/.gitkeep
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+*~
+
+# Temporary files
+*.tmp
+*.log

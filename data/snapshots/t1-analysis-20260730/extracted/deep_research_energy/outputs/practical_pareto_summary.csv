@@ -1,0 +1,4 @@
+tolerance_pct,mean_front_count,median_front_count,mean_dominated_fraction_pct,cells_with_one_point,cells_with_two_points,cells_with_cpu_on_front
+0,1.5490196078431373,1.0,91.39433551198256,26,23,6
+2,1.5098039215686274,1.0,91.61220043572985,26,24,6
+5,1.5098039215686274,1.0,91.61220043572985,26,24,6

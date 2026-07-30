@@ -1,0 +1,30 @@
+project:
+  name: objective-placement-map
+  analysis_scope: gpu_resident
+  canonical_snapshot: t1-analysis-20260730
+
+source:
+  repository: https://github.com/TheBuccaneer/energy
+  subtree: new
+  commit: REPLACE_WITH_EXACT_SOURCE_COMMIT
+
+statistics:
+  session_is_primary_unit: true
+  expected_sessions: 5
+  expected_repetitions_per_session: 10
+  practical_tolerances_pct: [0, 1, 2, 5, 10, 20]
+  bootstrap_seed: 20260730
+
+platforms:
+  - Intel_i9_7900X
+  - AMD_Threadripper_3970X
+  - RTX_3090
+  - RTX_5060_Ti
+
+workloads:
+  - GEMM
+  - STRIDED_GEMM
+  - AXPY
+  - STREAM
+  - REDUCTION
+  - CONV2D

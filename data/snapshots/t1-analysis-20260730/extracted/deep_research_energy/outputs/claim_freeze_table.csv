@@ -1,0 +1,18 @@
+claim,value,definition,robustness,paper_role
+Canonical hard conflicts,24/51,workload audit clear leaders with disjoint runtime/energy leader sets,fixed-selection session support plus tolerance sensitivity,abstract
+Large GPU regime,15/15,AXPY/STREAM/REDUCTION at 16M-256M,all cells and sessions available,abstract
+Median RTX 3090 speedup,"2.121874x [2.121340, 2.123785]",session-bootstrap median over 15 cells,5000 session bootstraps,abstract
+Median RTX 5060 Ti energy saving,"42.4739% [42.2244, 42.9774]",session-bootstrap median over 15 cells,5000 session bootstraps,abstract
+Conflicts without joint optimum,22/24 at 10%; 19/24 at 20%,all 18 measured configs compared to both cell optima,non-circular tolerance sensitivity,results
+EDP follows runtime,48/51,point-optimal platform,rank-correlation analysis,results
+Nested all-platform runtime selection,95.69% folds within 5%,"select on four sessions, test on fifth",255 all-platform folds,robustness
+Nested all-platform energy selection,95.29% folds within 5%,"select on four sessions, test on fifth",255 all-platform folds,robustness
+Nested GPU-only runtime selection,100.00% exact platform match,GPU selected on four sessions and tested on fifth,255 GPU-only folds,robustness
+Nested GPU-only energy selection,99.61% exact; 99.61% within 5%,GPU selected on four sessions and tested on fifth,255 GPU-only folds,robustness
+Nested canonical GPU conflicts,23/23 at 5/5 holdouts,23 canonical RTX 3090-vs-RTX 5060 Ti conflict cells,platforms reselected inside every four-session training fold,robustness
+Nested all-platform conflicts,22/24 at 5/5; 24/24 at >=4/5,all 18 configurations reselected within each training fold,two boundary cells contain one high-variation AMD session,robustness
+Always RTX 3090 energy tail,"CVaR10 486.87% [482.59, 490.22]",mean energy regret of the worst 10% of equally weighted GPU-only cells,5000 session bootstraps,results
+Always RTX 5060 Ti runtime tail,"CVaR10 427.26% [426.64, 427.76]",mean runtime regret of the worst 10% of equally weighted GPU-only cells,5000 session bootstraps,results
+Intel Reduction 256M near-free saving,28.29% energy for 0.244% runtime,4 threads versus runtime-optimal 8 threads,"energy CI [26.31, 35.59]%; runtime CI [-0.014, 0.443]%",results
+Maximum CPU threads energy regret,median 38.52%,maximum available thread count versus per-cell energy-optimal CPU thread count,102 CPU platform/workload/size cells,results
+Tolerance-aware decision front,mean 1.510/18 at 5%; 91.61% dominated,project tolerance-aware dominance rule,"strict, 2%, and 5% sensitivity",results

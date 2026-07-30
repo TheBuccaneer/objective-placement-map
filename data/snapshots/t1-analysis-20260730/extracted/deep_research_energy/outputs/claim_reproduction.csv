@@ -1,0 +1,12 @@
+claim_id,claim,reported,reproduced,own_value,deviation,cause
+1,51 workload-size/shape cells,51,yes,51,0 or rounding only,Five 9-size workloads plus six Conv2D shapes.
+2,Robust runtime/energy conflicts,24/51,yes,24/51,0 or rounding only,Current tie-aware placement outputs.
+3,Conflict counts by workload,"2,2,5,6,6,3",yes,"2,2,5,6,6,3",0 or rounding only,Canonical workload order.
+4,GPU-vs-GPU conflicts,23/24,yes,23/24,0 or rounding only,All but STREAM 4M.
+5,Large AXPY/STREAM/REDUCTION regime,15/15,yes,15/15,0 or rounding only,Five large sizes in each of three workloads.
+6,Median RTX 3090 speedup,2.121771x,yes,2.121771x,0 or rounding only,Median across 15 cells.
+7,Median RTX 5060 Ti energy saving,42.4566%,yes,42.4566%,0 or rounding only,Median across 15 cells.
+8,EDP winner equals runtime winner,48/51,yes,48/51,0 or rounding only,Point-optimal platforms.
+9,Always 3090 GPU-only median energy regret,72.3822%,yes,72.3822%,0 or rounding only,Per-cell GPU oracle.
+10,Always 5060 Ti GPU-only median runtime regret,110.5639%,yes,110.5639%,0 or rounding only,Per-cell GPU oracle.
+11,Intel Reduction 256M last runtime gain,0.2442% / 39.4493%,yes,0.2442% / 39.4493%,0 or rounding only,8T runtime optimum versus 4T energy optimum.
