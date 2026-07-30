@@ -2,8 +2,10 @@ SHELL := /bin/bash
 PYTHON := .venv/bin/python
 SNAPSHOT := data/snapshots/t1-analysis-20260730
 RUN_ARGS ?=
+SOURCE_REPO ?= $(HOME)/projects/energy
+SOURCE_INVENTORY_ARGS ?=
 
-.PHONY: setup verify test analysis analysis-check list-runs clean-failed
+.PHONY: setup verify test analysis analysis-check list-runs clean-failed source-inventory list-source-inventories
 
 setup:
 	python3 -m venv .venv
@@ -27,3 +29,10 @@ list-runs:
 
 clean-failed:
 	@find results/runs -mindepth 1 -maxdepth 1 -type d -name '*-FAILED' -print -exec rm -rf {} +
+
+
+source-inventory:
+	$(PYTHON) scripts/inventory_source_inputs.py --source-repo "$(SOURCE_REPO)" $(SOURCE_INVENTORY_ARGS)
+
+list-source-inventories:
+	@find results/source-inventory -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort

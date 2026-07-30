@@ -42,3 +42,18 @@ Every run is isolated under `results/runs/<run-id>/` and contains:
 The check target requires byte-identical CSV tables. Figures must have the same names, be valid PNG files, and match the reference format, color mode, and dimensions. PNG byte hashes are recorded but are informational because renderer metadata and font rasterization can vary across environments.
 Generated runs are intentionally excluded from Git; publish a selected run as a
 separate release artifact and cite its manifest.
+
+
+## Tracing frozen inputs to the measurement repository
+
+The configured measurement commit can be checked against a local clean clone:
+
+```bash
+make source-inventory SOURCE_REPO=~/projects/energy
+```
+
+The command scans only the configured `new` subtree and maps each of the 28
+frozen analysis inputs to exact source files using file size and SHA-256. It
+writes a local `SOURCE_INVENTORY.json` and `SOURCE_INPUT_MAP.csv` under
+`results/source-inventory/<run-id>/`. Unmatched inputs fail the command and must
+later be reconstructed through explicit transformation code.

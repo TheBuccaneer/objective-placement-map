@@ -1,0 +1,12 @@
+source_inventory:
+  schema_version: source-inventory-v1
+  subtree: new
+  canonical_snapshot_id: t1-analysis-20260730
+  canonical_package_subdir: extracted/deep_research_energy
+  canonical_inputs_subdir: inputs
+  expected_input_count: 28
+  require_clean_source_repository: true
+  require_exact_configured_commit: true
+  scan_regular_files_only: true
+  hash_only_candidate_sizes: true
+  selection_policy: exact_sha256_then_shortest_relative_path

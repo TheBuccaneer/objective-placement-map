@@ -21,3 +21,7 @@ results/runs/**
 # Temporary files
 *.tmp
 *.log
+
+# Local source-provenance inventories
+results/source-inventory/**
+!results/source-inventory/.gitkeep
