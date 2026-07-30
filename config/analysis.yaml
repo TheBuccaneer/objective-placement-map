@@ -1,0 +1,14 @@
+analysis:
+  snapshot_id: t1-analysis-20260730
+  snapshot_package_subdir: extracted/deep_research_energy
+  active_script: src/placement_analysis/analysis.py
+  expected_csv_tables: 37
+  expected_figures: 5
+  exact_reference_comparison: true
+  run_schema_version: analysis-run-v1
+
+execution:
+  python_hash_seed: "0"
+  matplotlib_backend: Agg
+  timezone: UTC
+  locale: C.UTF-8

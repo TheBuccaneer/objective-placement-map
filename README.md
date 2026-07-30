@@ -22,3 +22,23 @@ python scripts/verify_snapshot.py data/snapshots/t1-analysis-20260730
 
 The initial snapshot is an archived, independently reproduced analysis state.
 It is preserved unchanged; active analysis code will be migrated into `src/` in the next step.
+
+## Reproducing the canonical analysis
+
+```bash
+source .venv/bin/activate
+make verify
+make test
+make analysis-check
+```
+
+Every run is isolated under `results/runs/<run-id>/` and contains:
+
+- `RUN_MANIFEST.json`,
+- stdout and stderr logs,
+- 37 regenerated CSV tables,
+- five regenerated figures.
+
+The check target requires byte-identical outputs versus the frozen reference.
+Generated runs are intentionally excluded from Git; publish a selected run as a
+separate release artifact and cite its manifest.
