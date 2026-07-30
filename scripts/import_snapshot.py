@@ -73,7 +73,11 @@ def main() -> int:
         )
         if bad_member:
             raise RuntimeError(f"unsafe ZIP member: {bad_member}")
-        zf.extractall(extracted)
+        for member in zf.infolist():
+            member_path = Path(member.filename)
+            if "__pycache__" in member_path.parts or member_path.suffix in {".pyc", ".pyo"}:
+                continue
+            zf.extract(member, extracted)
 
     manifest_lines: list[str] = []
     for file_path in sorted(p for p in snapshot_dir.rglob("*") if p.is_file()):

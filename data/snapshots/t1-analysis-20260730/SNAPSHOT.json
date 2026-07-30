@@ -1,7 +1,16 @@
 {
   "created_at_utc": "2026-07-30T12:16:43.679289+00:00",
-  "file_count": 82,
+  "file_count": 81,
   "git_version": "git version 2.51.0",
+  "normalization": {
+    "excluded_from_extracted_view": [
+      "**/__pycache__/**",
+      "**/*.pyc",
+      "**/*.pyo"
+    ],
+    "reason": "Generated Python bytecode is interpreter-specific and ignored by Git.",
+    "source_archive_preserved_byte_identical": true
+  },
   "python_version": "3.13.7 (main, Mar  3 2026, 12:19:54) [GCC 15.2.0]",
   "snapshot_format": 1,
   "source_archive_name": "T1_ANALYSIS_COMPLETED_20260730.zip",
