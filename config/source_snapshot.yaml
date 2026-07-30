@@ -1,0 +1,11 @@
+source_snapshot:
+  schema_version: source-snapshot-v1
+  inventory_schema_version: source-inventory-v1
+  directory_prefix: energy-
+  expected_input_count: 28
+  require_clean_source_repository: true
+  require_exact_configured_commit: true
+  preserve_source_relative_paths: true
+  copied_files_read_only: true
+  manifest_algorithm: sha256
+  tracked_in_git: true

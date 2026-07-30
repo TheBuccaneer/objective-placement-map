@@ -57,3 +57,19 @@ frozen analysis inputs to exact source files using file size and SHA-256. It
 writes a local `SOURCE_INVENTORY.json` and `SOURCE_INPUT_MAP.csv` under
 `results/source-inventory/<run-id>/`. Unmatched inputs fail the command and must
 later be reconstructed through explicit transformation code.
+
+
+## Pinning the exact measurement inputs
+
+After a successful source inventory, create a Git-trackable snapshot of the 28
+exact input files:
+
+```bash
+make source-snapshot SOURCE_REPO=~/projects/energy
+make verify-source-snapshots
+```
+
+The snapshot is stored under `data/source-snapshots/energy-<commit12>/`. It
+preserves the original source-relative paths and includes `SNAPSHOT.json`, the
+inventory map, and a SHA-256 manifest. This closes the provenance chain from the
+pinned `energy/new` commit to every canonical analysis input.
