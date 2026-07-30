@@ -6,7 +6,7 @@ project:
 source:
   repository: https://github.com/TheBuccaneer/energy
   subtree: new
-  commit: REPLACE_WITH_EXACT_SOURCE_COMMIT
+  commit: e54128a613e7d6adc46150c020b26b6f98a4c0a2
 
 statistics:
   session_is_primary_unit: true
