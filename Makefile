@@ -75,3 +75,7 @@ list-input-builds:
 
 reproduce:
 	$(PYTHON) scripts/run_analysis.py --compare-reference --inputs-from-source-snapshot $(RUN_ARGS)
+
+.PHONY: docs-check
+docs-check:
+	$(PYTHON) scripts/check_publication_docs.py

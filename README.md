@@ -1,102 +1,132 @@
-# Objective-Dependent CPU/GPU Placement
+# Objective-Dependent CPU/GPU Placement Map
 
-Reproducible analysis repository for the energy/runtime placement study.
+Reproducible analysis repository for a four-platform, six-workload
+energy-runtime measurement study.
 
-## Repository rules
+The repository evaluates when runtime-, energy-, and EDP-optimal placement
+decisions diverge across:
 
-1. Files under `data/snapshots/` are immutable input snapshots.
-2. Mutable or newly collected files belong in `data/raw/` and are not committed directly.
-3. Every analysis run writes to a new directory under `results/runs/`.
-4. Paper claims must reference a frozen run manifest and exact output file.
-5. Sessions, not individual repetitions, are the primary statistical units.
+- Intel Core i9-7900X
+- AMD Threadripper 3970X
+- NVIDIA RTX 3090
+- NVIDIA RTX 5060 Ti
 
-## Initial setup
+and six workload families:
+
+- GEMM
+- STRIDED_GEMM
+- AXPY
+- STREAM
+- REDUCTION
+- CONV2D
+
+## Reproducibility status
+
+The complete analysis path is closed and tested:
+
+```text
+energy/new@e54128a613e7d6adc46150c020b26b6f98a4c0a2
+        ↓
+28 pinned source files
+        ↓
+28 rebuilt canonical analysis inputs
+        ↓
+37 generated CSV result tables
+        ↓
+5 generated figures
+        ↓
+reference and provenance validation
+```
+
+A successful reproduction requires:
+
+- **28/28** source-derived inputs to match the frozen reference;
+- **37/37** generated CSVs to be byte-identical;
+- all five generated figures to satisfy the reference figure contract;
+- the complete nested session validation to pass.
+
+## Quick reproduction
 
 ```bash
+git clone git@github.com:TheBuccaneer/objective-placement-map.git
+cd objective-placement-map
+
 python3 -m venv .venv
 source .venv/bin/activate
+
 python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
-python scripts/verify_snapshot.py data/snapshots/t1-analysis-20260730
-```
+python -m pip install -r requirements-lock.txt
 
-The initial snapshot is an archived, independently reproduced analysis state.
-It is preserved unchanged; active analysis code will be migrated into `src/` in the next step.
-
-## Reproducing the canonical analysis
-
-```bash
-source .venv/bin/activate
 make verify
-make test
-make analysis-check
-```
-
-Every run is isolated under `results/runs/<run-id>/` and contains:
-
-- `RUN_MANIFEST.json`,
-- stdout and stderr logs,
-- 37 regenerated CSV tables,
-- five regenerated figures.
-
-The check target requires byte-identical CSV tables. Figures must have the same names, be valid PNG files, and match the reference format, color mode, and dimensions. PNG byte hashes are recorded but are informational because renderer metadata and font rasterization can vary across environments.
-Generated runs are intentionally excluded from Git; publish a selected run as a
-separate release artifact and cite its manifest.
-
-
-## Tracing frozen inputs to the measurement repository
-
-The configured measurement commit can be checked against a local clean clone:
-
-```bash
-make source-inventory SOURCE_REPO=~/projects/energy
-```
-
-The command scans only the configured `new` subtree and maps each of the 28
-frozen analysis inputs to exact source files using file size and SHA-256. It
-writes a local `SOURCE_INVENTORY.json` and `SOURCE_INPUT_MAP.csv` under
-`results/source-inventory/<run-id>/`. Unmatched inputs fail the command and must
-later be reconstructed through explicit transformation code.
-
-
-## Pinning the exact measurement inputs
-
-After a successful source inventory, create a Git-trackable snapshot of the 28
-exact input files:
-
-```bash
-make source-snapshot SOURCE_REPO=~/projects/energy
 make verify-source-snapshots
-```
-
-The snapshot is stored under `data/source-snapshots/energy-<commit12>/`. It
-preserves the original source-relative paths and includes `SNAPSHOT.json`, the
-inventory map, and a SHA-256 manifest. This closes the provenance chain from the
-pinned `energy/new` commit to every canonical analysis input.
-
-## Full source-to-paper reproduction
-
-The complete provenance chain can be exercised without reading the canonical
-inputs from the historical analysis package:
-
-```bash
-source .venv/bin/activate
-make verify-source-snapshots
-make build-inputs
 make reproduce
 ```
 
-`make build-inputs` reconstructs all 28 canonical input CSVs from the pinned
-measurement-source snapshot and verifies every file byte-for-byte against the
-frozen paper reference. `make reproduce` then uses a fresh materialization in
-an isolated analysis run and requires all 37 numerical output tables to match
-the frozen reference exactly.
+Expected final output:
 
-Each successful reproduction retains:
+```text
+PASS: analysis run ...
+Generated: 37 CSV tables and 5 figures
+Reference comparison: CSV tables byte-identical; figure contracts matched
+Analysis inputs: rebuilt from pinned source snapshot; 28/28 exact reference matches
+```
 
-- the source-snapshot identity and measurement commit,
-- a per-input source-path and SHA-256 map,
-- an input-materialization manifest,
-- 37 regenerated result tables,
-- five regenerated figures,
-- the complete analysis run manifest and logs.
+See [REPRODUCING.md](REPRODUCING.md) for the complete procedure.
+
+## Repository structure
+
+```text
+.
+├── config/                 # pinned source and analysis policy
+├── data/
+│   ├── source-snapshots/   # immutable upstream-derived inputs
+│   └── snapshots/          # frozen reference analysis bundle
+├── docs/
+│   ├── decisions/          # architecture decision records
+│   └── DATA_DICTIONARY.md
+├── results/
+│   ├── input-builds/       # locally rebuilt canonical inputs
+│   ├── runs/               # isolated analysis runs
+│   └── source-inventory/   # byte-level provenance inventories
+├── scripts/                # reproducibility and provenance entry points
+├── src/                    # active Python package
+├── tests/                  # repository and pipeline contracts
+├── REPRODUCING.md
+└── Makefile
+```
+
+## Primary commands
+
+```bash
+make verify
+make test
+make docs-check
+make build-inputs
+make reproduce
+make source-inventory SOURCE_REPO=~/projects/energy
+```
+
+## Analysis scope
+
+The analysis covers **918 measured configurations**, five independent sessions,
+and **51 canonical workload-size/shape cells**. Sessions are the primary
+statistical units.
+
+GPU results use the documented `gpu_resident` scope. Allocations,
+initialization, and host/device transfers are outside the measured interval.
+GPU energy is NVML device/board energy. CPU energy is based on documented RAPL
+domains. Cross-domain claims must retain these boundaries.
+
+## Documentation
+
+- [Complete reproduction guide](REPRODUCING.md)
+- [Data dictionary](docs/DATA_DICTIONARY.md)
+- [Licensing scope](docs/LICENSING.md)
+- [Repository decisions](docs/decisions/)
+
+## License
+
+Original analysis code and repository documentation are licensed under the
+[MIT License](LICENSE). Bundled measurement snapshots retain the terms and
+attribution requirements of their upstream source. See
+[docs/LICENSING.md](docs/LICENSING.md).
