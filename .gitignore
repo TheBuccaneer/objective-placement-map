@@ -29,3 +29,5 @@ results/source-inventory/**
 # Locally materialized canonical input builds
 results/input-builds/**
 !results/input-builds/.gitkeep
+
+results/extended-analysis/

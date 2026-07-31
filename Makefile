@@ -79,3 +79,7 @@ reproduce:
 .PHONY: docs-check
 docs-check:
 	$(PYTHON) scripts/check_publication_docs.py
+
+.PHONY: extended-analysis
+extended-analysis:
+	$(PYTHON) scripts/analyze_context_geometry.py --repo .
