@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the metadata below."
+title: "Objective-Dependent CPU/GPU Placement Map"
+type: software
+version: 1.0.0
+abstract: "Reproducible analysis artifact for an objective-dependent CPU/GPU placement study across four platforms, six kernel families, and 51 workload-size or shape cells."
+authors:
+  - family-names: "Bicanic"
+    given-names: "Tihomir Thomas"
+    affiliation: "Trier University"
+    orcid: "https://orcid.org/0009-0003-1562-3497"
+keywords:
+  - CPU-GPU placement
+  - energy measurement
+  - performance measurement
+  - placement regret
+  - reproducible benchmarking
