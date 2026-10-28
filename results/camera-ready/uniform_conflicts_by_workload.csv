@@ -1,0 +1,7 @@
+workload,cells,exact_conflicts,unresolved_10pct,unresolved_20pct
+GEMM,9,2,2,2
+STRIDED_GEMM,9,3,2,2
+AXPY,9,5,5,5
+STREAM,9,6,6,5
+REDUCTION,9,6,5,5
+CONV2D,6,3,2,0

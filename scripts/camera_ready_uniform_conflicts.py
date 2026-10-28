@@ -197,3 +197,34 @@ annex.round(4).to_csv(
 print("\nPASS: Conflict detail table")
 print("Conflict cells:", len(annex))
 print("Output:", OUT / "uniform_conflict_details_25_cells.csv")
+
+# Camera-ready: Uniform conflicts by workload family
+
+family_order = [
+    "GEMM", "STRIDED_GEMM", "AXPY",
+    "STREAM", "REDUCTION", "CONV2D"
+]
+
+family_summary = (
+    result.groupby("workload")
+    .agg(
+        cells=("size", "count"),
+        exact_conflicts=("exact_conflict", "sum"),
+        unresolved_10pct=("unresolved_10pct", "sum"),
+        unresolved_20pct=("unresolved_20pct", "sum"),
+    )
+    .reindex(family_order)
+    .reset_index()
+)
+
+assert family_summary[
+    ["cells", "exact_conflicts", "unresolved_10pct", "unresolved_20pct"]
+].sum().tolist() == [51, 25, 22, 19]
+
+family_summary.to_csv(
+    OUT / "uniform_conflicts_by_workload.csv",
+    index=False
+)
+
+print("\nPASS: Workload-family summary")
+print(family_summary.to_string(index=False))
