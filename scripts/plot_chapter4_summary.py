@@ -16,7 +16,7 @@ WORKLOADS = [
     "Conv2D",
 ]
 
-CONFLICTS = np.array([2, 2, 5, 6, 6, 3])
+CONFLICTS = np.array([2, 3, 5, 6, 6, 3])
 TOTALS = np.array([9, 9, 9, 9, 9, 6])
 
 TOLERANCE_LABELS = [
@@ -24,13 +24,13 @@ TOLERANCE_LABELS = [
     r"$\delta=10\%$",
     r"$\delta=20\%$",
 ]
-UNRESOLVED = np.array([24, 22, 19])
+UNRESOLVED = np.array([25, 22, 19])
 
 
 def validate_values() -> None:
-    if int(CONFLICTS.sum()) != 24:
+    if int(CONFLICTS.sum()) != 25:
         raise ValueError(
-            f"Expected 24 conflicts, found {int(CONFLICTS.sum())}."
+            f"Expected 25 conflicts, found {int(CONFLICTS.sum())}."
         )
 
     if int(TOTALS.sum()) != 51:
@@ -38,7 +38,7 @@ def validate_values() -> None:
             f"Expected 51 cells, found {int(TOTALS.sum())}."
         )
 
-    if UNRESOLVED.tolist() != [24, 22, 19]:
+    if UNRESOLVED.tolist() != [25, 22, 19]:
         raise ValueError(
             f"Unexpected near-optimality values: {UNRESOLVED.tolist()}."
         )
@@ -150,7 +150,8 @@ def main() -> None:
     )
 
     # Focus on the observed range. All values are printed explicitly.
-    ax_right.set_ylim(17, 25.5)
+    ax_right.set_ylim(17, 26.5)
+    ax_right.set_xlim(-0.15, 2.28)
     ax_right.set_yticks([18, 20, 22, 24])
 
     ax_right.set_ylabel("Unresolved conflicts")
@@ -179,7 +180,7 @@ def main() -> None:
     ax_right.text(
         0.5,
         0.045,
-        "19/24 remain unresolved\nat 20% tolerance",
+        "19/25 remain unresolved\nat 20% tolerance",
         transform=ax_right.transAxes,
         ha="center",
         va="bottom",
